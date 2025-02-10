@@ -18,7 +18,7 @@ function App() {
     <div className={theme}>
       <Routes>
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />
-        <Route path="/detail/:id" element={<MainLayout><Details /></MainLayout>} />
+        <Route path="/:id" element={<MainLayout><Details /></MainLayout>} />
         <Route path="*" element={<MainLayout><ErrorPage /></MainLayout>} />
       </Routes>
     </div>
