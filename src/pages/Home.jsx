@@ -53,59 +53,68 @@ function Home() {
     <div>
       {
         modal && (
-          <div className='top-0 left-0 fixed bg-white dark:bg-[#141625] px-[24px] pt-[32px] pb-[188px] w-screen h-screen animate-slideIn scroll-auto'>
-            <div className="overflow-y-auto">
+          <div>
+            <div className='top-[70px] md:top-[80px] lg:top-0 left-0 lg:left-[103px] fixed bg-white dark:bg-[#141625] px-[24px] pt-[32px] pb-[228px] lg:pb-[100px] w-screen md:w-full md:max-w-[616px] h-screen overflow-y-auto animate-slideIn scroll-auto'>
               <button onClick={() => { setModal(false) }} className='flex items-center gap-[24px] font-bold text-[#0C0E16] text-[12px] dark:text-white'><img className='rotate-[90deg]' src={GoBack} /> Go back</button>
               <h3 className="my-[24px] font-bold text-[#0C0E16] text-[24px] dark:text-white">New Invoice</h3>
               <p className="mb-[24px] font-bold text-[#7C5DFA] text-[12px]">Bill From</p>
-              <div className="mb-[40px]">
+              <div className="flex flex-col mb-[40px]">
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="streetAddress1">Street Address
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="streetAddress1" />
+                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="streetAddress1" />
                 </label>
-                <div className="flex justify-between md:gap-[23px] my-[24px]">
-                  <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="city1">City
-                    <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="city1" />
-                  </label>
-                  <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="postCode1">Post Code
-                    <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="postCode1" />
+                <div className="md:flex md:items-center gap-[24px]">
+                  <div className="flex gap-[23px] md:gap-[24px] my-[24px] w-full">
+                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="city1">City
+                      <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="city1" />
+                    </label>
+                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="postCode1">Post Code
+                      <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="postCode1" />
+                    </label>
+                  </div>
+                  <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="country1">Country
+                    <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="country1" />
                   </label>
                 </div>
-                <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="country1">Country
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="country1" />
-                </label>
               </div>
-              <div>
-                <p className="mb-[24px] font-bold text-[#7C5DFA] text-[12px]">Bill To</p>
+              <div className="flex flex-col gap-[24px]">
+                <p className="font-bold text-[#7C5DFA] text-[12px]">Bill To</p>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="name">Client’s Name
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="name" />
+                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="name" />
                 </label>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="email">Client’s Email
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="email" />
+                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="email" />
                 </label>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="streetAddress2">Street Address
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="streetAddress2" />
+                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="streetAddress2" />
                 </label>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="city2">City
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="city2" />
+                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="city2" />
                 </label>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="postCode2">Post Code
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="postCode2" />
+                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="postCode2" />
                 </label>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="country2">Country
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="country2" />
+                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="country2" />
                 </label>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="invoiceDate">Invoice Date
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="invoiceDate" />
+                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="invoiceDate" />
                 </label>
-                <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="paymentTerms">Payment Terms
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="paymentTerms" />
-                </label>
-                <label className="flex flex-col font-normalgap-[10px] text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="projectDescription">Project Description
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="projectDescription" />
-                </label>
+                <div className="md:flex gap-[24px]">
+                  <div className="flex gap-[23px] md:gap-[24px] mb-[24px] w-full">
+                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="paymentTerms">Payment Terms
+                      <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="paymentTerms" />
+                    </label>
+                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="projectDescription">Project Description
+                      <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="projectDescription" />
+                    </label>
+                  </div>
+                  <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="projectDescription">Country
+                    <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="projectDescription" />
+                  </label>
+                </div>
               </div>
             </div>
-            <div className="right-0 bottom-0 left-0 fixed flex justify-between gap-[5px] bg-white dark:bg-[#1E2139] px-[24px] py-[22px]">
+            <div className="bottom-0 left-0 lg:left-[73px] fixed flex justify-between gap-[5px] bg-white dark:bg-[#1E2139] px-[24px] py-[22px] md:pl-[50px] w-full md:max-w-[616px] lg:md:max-w-[646px] overflow-hidden animate-slideIn">
               <button onClick={() => { setModal(false) }} className="bg-[#F9FAFE] dark:bg-[#252945] px-[16px] py-[17px] rounded-[24px] font-bold text-[#7E88C3] text-[12px] dark:text-[#DFE3FA] active:scale-95 transition-[0.3s]">Discard</button>
               <button className="bg-[#373B53] px-[16px] py-[17px] rounded-[24px] font-bold text-[#888EB0] text-[12px] dark:text-[#DFE3FA] active:scale-95 transition-[0.3s]">Save as Draft</button>
               <button className="bg-[#7C5DFA] px-[16px] py-[17px] rounded-[24px] font-bold text-[12px] text-white active:scale-95 transition-[0.3s]">Save & Send</button>
