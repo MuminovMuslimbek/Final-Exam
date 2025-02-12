@@ -39,6 +39,15 @@ function Home() {
     },
   ]);
 
+  const filter = ["Paid", "Pending", "Draft"];
+
+  const transition = { duration: 0.3, ease: "easeInOut" };
+
+  const variants = {
+    open: { opacity: 1, y: 0, transition },
+    close: { opacity: 0, y: -10, transition },
+  };
+
   useEffect(() => {
     let storedData = JSON.parse(localStorage.getItem('data'));
 
@@ -71,26 +80,6 @@ function Home() {
     );
   }
 
-  const validateForm = () => {
-    for (let i = 0; i < boxes.length; i++) {
-      const { name, quantity, price } = boxes[i];
-
-      if (!name.trim()) {
-        alert(`${i + 1}-qator: Item Name kiritilishi shart!`);
-        return false;
-      }
-      if (quantity <= 0) {
-        alert(`${i + 1}-qator: Quantity 1 yoki undan katta bo‘lishi kerak!`);
-        return false;
-      }
-      if (price < 0) {
-        alert(`${i + 1}-qator: Price manfiy bo‘lishi mumkin emas!`);
-        return false;
-      }
-    }
-    return true;
-  };
-
   useEffect(() => {
     if (data.length) {
       setCount(data.length);
@@ -111,15 +100,6 @@ function Home() {
     setBoxes((prBox) => prBox.filter((_, idx) => idx !== id));
   }
 
-  const filter = ["Paid", "Pending", "Draft"];
-
-  const transition = { duration: 0.3, ease: "easeInOut" };
-
-  const variants = {
-    open: { opacity: 1, y: 0, transition },
-    close: { opacity: 0, y: -10, transition },
-  };
-
   function formatDate(dateStr) {
     const options = { day: '2-digit', month: 'short', year: 'numeric' };
     return new Date(dateStr).toLocaleDateString('en-GB', options).replace(',', '');
@@ -129,6 +109,25 @@ function Home() {
     navigate(`/${id}`)
   }
 
+   const validateForm = () => {
+    for (let i = 0; i < boxes.length; i++) {
+      const { name, quantity, price } = boxes[i];
+
+      if (!name.trim()) {
+        alert(`${i + 1}-qator: Item Name kiritilishi shart!`);
+        return false;
+      }
+      if (quantity <= 0) {
+        alert(`${i + 1}-qator: Quantity 1 yoki undan katta bo‘lishi kerak!`);
+        return false;
+      }
+      if (price < 0) {
+        alert(`${i + 1}-qator: Price manfiy bo‘lishi mumkin emas!`);
+        return false;
+      }
+    }
+    return true;
+  };
 
   function validate() {
     if (!streetAddress) {
