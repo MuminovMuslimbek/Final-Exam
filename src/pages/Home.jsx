@@ -7,29 +7,109 @@ import SelectIcon from "../assets/select.svg";
 import GoInDetail from '../assets/goInDetail.svg'
 import DataJson from '../assets/data.json'
 import GoBack from '../assets/select.svg'
+import Delete from '../assets/delete.svg'
+import useDataStore from "../store/useDataStore";
 
 function Home() {
   const [count, setCount] = useState(0);
-  const [data, setData] = useState([]);
+  const { data, setData, addData } = useDataStore();
   const [isDropdown, setIsDropdown] = useState(false);
   const [filterValue, setFilterValue] = useState('');
   const [modal, setModal] = useState(false)
+  const [streetAddress, setStreetAddress] = useState('')
+  const [fromCity, setFromCity] = useState('')
+  const [fromPostCode, setFromPostCode] = useState('')
+  const [fromCountry, setFromCountry] = useState('')
+  const [clientName, setClientName] = useState('')
+  const [clientEmail, setClientEmail] = useState('')
+  const [toStreetAddress, setToStreetAddress] = useState('')
+  const [toCity, setToCity] = useState('')
+  const [toPostCode, setToPostCode] = useState('')
+  const [toCountry, setToCountry] = useState('')
+  const [invoiceDate, setInvoiceDate] = useState('')
+  const [paymentTerms, setPaymentTerms] = useState('Next 1 day')
+  const [description, setDescription] = useState('')
   const navigate = useNavigate()
+  const [boxes, setBoxes] = useState([
+    {
+      name: "",
+      quantity: 1,
+      price: '',
+      total: 0,
+    },
+  ]);
 
   useEffect(() => {
+    let storedData = JSON.parse(localStorage.getItem('data'));
+
+    if (!storedData) {
+      localStorage.setItem('data', JSON.stringify(DataJson));
+      storedData = DataJson;
+    }
+
     if (filterValue !== '') {
       let valFil = filterValue.toLowerCase();
-      setData(DataJson.filter((el) => el.status.toLowerCase() === valFil));
+      setData(storedData.filter((el) => el.status.toLowerCase() === valFil));
     } else {
-      setData(DataJson)
+      setData(storedData);
     }
   }, [filterValue]);
+
+  function handleChange(index, field, value) {
+    setBoxes((prevBoxes) =>
+      prevBoxes.map((box, idx) => {
+        if (idx === index) {
+          const updatedBox = { ...box, [field]: value };
+          if (field === "quantity" || field === "price") {
+            updatedBox.total = (updatedBox.quantity * updatedBox.price).toFixed(2);
+          }
+
+          return updatedBox;
+        }
+        return box;
+      })
+    );
+  }
+
+  const validateForm = () => {
+    for (let i = 0; i < boxes.length; i++) {
+      const { name, quantity, price } = boxes[i];
+
+      if (!name.trim()) {
+        alert(`${i + 1}-qator: Item Name kiritilishi shart!`);
+        return false;
+      }
+      if (quantity <= 0) {
+        alert(`${i + 1}-qator: Quantity 1 yoki undan katta bo‘lishi kerak!`);
+        return false;
+      }
+      if (price < 0) {
+        alert(`${i + 1}-qator: Price manfiy bo‘lishi mumkin emas!`);
+        return false;
+      }
+    }
+    return true;
+  };
 
   useEffect(() => {
     if (data.length) {
       setCount(data.length);
     }
   }, [data]);
+
+  function addBoxFun() {
+    const newItem = {
+      name: "",
+      quantity: 1,
+      price: '',
+      total: 0,
+    };
+    setBoxes([...boxes, newItem]);
+  }
+
+  function deleteBox(id) {
+    setBoxes((prBox) => prBox.filter((_, idx) => idx !== id));
+  }
 
   const filter = ["Paid", "Pending", "Draft"];
 
@@ -49,75 +129,242 @@ function Home() {
     navigate(`/${id}`)
   }
 
+
+  function validate() {
+    if (!streetAddress) {
+      alert('streetAddress ni kiritmadingiz')
+      return false
+    }
+    if (!fromCity) {
+      alert('fromCity ni kiritmadingiz')
+      return false
+    }
+    if (!fromPostCode) {
+      alert('fromPostCode ni kiritmadingiz')
+      return false
+    }
+    if (!fromCountry) {
+      alert('fromCountry ni kiritmadingiz')
+      return false
+    }
+    if (!clientName) {
+      alert('clientName ni kiritmadingiz')
+      return false
+    }
+    if (!clientEmail) {
+      alert('clientEmail ni kiritmadingiz')
+      return false
+    }
+    if (!toStreetAddress) {
+      alert('toStreetAddress ni kiritmadingiz')
+      return false
+    }
+    if (!toCity) {
+      alert('toCityni kiritmadingiz')
+      return false
+    }
+    if (!toPostCode) {
+      alert('toPostCode ni kiritmadingiz')
+      return false
+    }
+    if (!toCountry) {
+      alert('toCountry ni kiritmadingiz')
+      return false
+    }
+    if (!invoiceDate) {
+      alert('invoiceDate ni kiritmadingiz')
+      return false
+    }
+    if (!paymentTerms) {
+      alert('paymentTerms ni kiritmadingiz')
+      return false
+    }
+    if (!description) {
+      alert('description ni kiritmadingiz')
+      return false
+    }
+    if (!validateForm()) {
+      return false
+    }
+    return true
+  }
+
+  function handleAddNewCard(arg) {
+
+    let isValid = validate()
+    if (!isValid) {
+      return
+    }
+
+    const time = new Date();
+    const terms = paymentTerms.match(/\d+/)?.[0] || 1
+    const totalSum = boxes.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+    const paymentDue = new Date(time.setDate(time.getDate() + parseInt(terms))).toISOString().split('T')[0];
+
+    let data = {
+      "id": Date.now(),
+      "createdAt": invoiceDate,
+      "paymentDue": paymentDue,
+      "description": description,
+      "paymentTerms": parseInt(terms),
+      "clientName": clientName,
+      "clientEmail": clientEmail,
+      "status": arg == 'pending' ? 'pending' : 'draft',
+      "senderAddress": {
+        "street": streetAddress,
+        "city": fromCity,
+        "postCode": fromPostCode,
+        "country": fromCountry
+      },
+      "clientAddress": {
+        "street": toStreetAddress,
+        "city": toCity,
+        "postCode": toPostCode,
+        "country": toCountry
+      },
+      "items": boxes.map(box => ({
+        "name": box.name,
+        "quantity": box.quantity,
+        "price": box.price,
+        "total": box.quantity * box.price
+      })),
+      "total": totalSum
+    }
+    addData(data);
+    setModal(false)
+  }
+
   return (
     <div>
       {
         modal && (
           <div>
-            <div className='top-[70px] md:top-[80px] lg:top-0 left-0 lg:left-[103px] fixed bg-white dark:bg-[#141625] px-[24px] pt-[32px] pb-[228px] lg:pb-[100px] w-screen md:w-full md:max-w-[616px] h-screen overflow-y-auto animate-slideIn scroll-auto'>
+            <div onClick={() => { setModal(false) }} className='top-0 left-0 z-40 fixed bg-black opacity-[49.84%] w-full h-screen'></div>
+            <div className='top-[70px] md:top-[80px] lg:top-0 left-0 lg:left-[103px] z-40 fixed bg-white dark:bg-[#141625] px-[24px] pt-[32px] pb-[208px] lg:pb-[150px] w-screen md:w-full md:max-w-[616px] h-screen overflow-y-auto animate-slideIn scroll-auto'>
               <button onClick={() => { setModal(false) }} className='flex items-center gap-[24px] font-bold text-[#0C0E16] text-[12px] dark:text-white'><img className='rotate-[90deg]' src={GoBack} /> Go back</button>
               <h3 className="my-[24px] font-bold text-[#0C0E16] text-[24px] dark:text-white">New Invoice</h3>
               <p className="mb-[24px] font-bold text-[#7C5DFA] text-[12px]">Bill From</p>
               <div className="flex flex-col mb-[40px]">
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="streetAddress1">Street Address
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="streetAddress1" />
+                  <input value={streetAddress} onChange={(e) => { setStreetAddress(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="streetAddress1" />
                 </label>
                 <div className="md:flex md:items-center gap-[24px]">
                   <div className="flex gap-[23px] md:gap-[24px] my-[24px] w-full">
                     <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="city1">City
-                      <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="city1" />
+                      <input value={fromCity} onChange={(e) => { setFromCity(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="city1" />
                     </label>
                     <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="postCode1">Post Code
-                      <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="postCode1" />
+                      <input value={fromPostCode} onChange={(e) => { setFromPostCode(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="postCode1" />
                     </label>
                   </div>
                   <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="country1">Country
-                    <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="country1" />
+                    <input value={fromCountry} onChange={(e) => { setFromCountry(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="country1" />
                   </label>
                 </div>
               </div>
               <div className="flex flex-col gap-[24px]">
                 <p className="font-bold text-[#7C5DFA] text-[12px]">Bill To</p>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="name">Client’s Name
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="name" />
+                  <input value={clientName} onChange={(e) => { setClientName(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="name" />
                 </label>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="email">Client’s Email
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="email" />
+                  <input value={clientEmail} onChange={(e) => { setClientEmail(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="email" id="email" />
                 </label>
                 <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="streetAddress2">Street Address
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="streetAddress2" />
+                  <input value={toStreetAddress} onChange={(e) => { setToStreetAddress(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="" id="streetAddress2" />
                 </label>
-                <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="city2">City
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="city2" />
-                </label>
-                <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="postCode2">Post Code
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="postCode2" />
-                </label>
-                <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="country2">Country
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="country2" />
-                </label>
-                <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="invoiceDate">Invoice Date
-                  <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="invoiceDate" />
-                </label>
-                <div className="md:flex gap-[24px]">
-                  <div className="flex gap-[23px] md:gap-[24px] mb-[24px] w-full">
-                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="paymentTerms">Payment Terms
-                      <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="paymentTerms" />
+                <div className="flex md:flex-row flex-col gap-[24px] mb-[24px]">
+                  <div className="flex gap-[24px] w-full">
+                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="city2">City
+                      <input value={toCity} onChange={(e) => { setToCity(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="city2" />
                     </label>
-                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="projectDescription">Project Description
-                      <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="projectDescription" />
+                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="postCode2">Post Code
+                      <input value={toPostCode} onChange={(e) => { setToPostCode(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="postCode2" />
                     </label>
                   </div>
-                  <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="projectDescription">Country
-                    <input className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="projectDescription" />
+                  <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="country2">Country
+                    <input value={toCountry} onChange={(e) => { setToCountry(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="country2" />
+                  </label>
+                </div>
+                <div className="flex flex-col gap-[24px] mt-[18px]">
+                  <div className="flex md:flex-row flex-col gap-[24px]">
+                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="invoiceDate">Invoice Date
+                      <input value={invoiceDate} onChange={(e) => { setInvoiceDate(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="date" id="invoiceDate" />
+                    </label>
+                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="select">Payment Terms
+                      <select value={paymentTerms} onChange={(e) => { setPaymentTerms(e.target.value) }} id="select" className="bg-white dark:bg-[#1E2139] px-[20px] border border-gray-300 dark:border-[#252945] rounded-md w-full h-[48px] text-[#7E88C3] text-[12px] dark:text-[#888EB0]">
+                        <option value="Next 1 day">Next 1 day</option>
+                        <option value="Next 7 day">Next 7 day</option>
+                        <option value="Next 14 day">Next 14 day</option>
+                        <option value="Next 30 day">Next 30 day</option>
+                      </select>
+                    </label>
+                  </div>
+                  <label className="flex flex-col gap-[10px] font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]" htmlFor="projectDescription2">Project Description
+                    <input value={description} onChange={(e) => { setDescription(e.target.value) }} className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white dark:boder-[#252945] #DFE3FA]" type="text" id="projectDescription2" />
                   </label>
                 </div>
               </div>
+              <div className="flex flex-col gap-[48px] md:gap-[18px] mt-[50px]">
+                <h4 className="mt-[24px] font-bold text-[#777F98] text-[18px]">Item List</h4>
+                {boxes.map((val, idx) => (
+                  <div className="flex md:flex-row flex-col items-end gap-[24px] md:gap-[18px]" key={idx}>
+                    <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]">
+                      Item Name
+                      <input
+                        className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white"
+                        type="text"
+                        value={val.name}
+                        onChange={(e) => handleChange(idx, "name", e.target.value)}
+                      />
+                    </label>
+                    <div className="flex items-center gap-[16px]">
+                      <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]">
+                        Qty.
+                        <input
+                          className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white"
+                          type="number"
+                          value={val.quantity}
+                          onChange={(e) => handleChange(idx, "quantity", parseFloat(e.target.value) || 0)}
+                        />
+                      </label>
+                      <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]">
+                        Price
+                        <input
+                          className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-[#7C5DFA] w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white"
+                          type="number"
+                          value={val.price}
+                          onChange={(e) => handleChange(idx, "price", parseFloat(e.target.value) || 0)}
+                        />
+                      </label>
+                      <label className="flex flex-col gap-[10px] w-full font-normal text-[#7E88C3] text-[12px] dark:text-[#888EB0]">
+                        Total
+                        <input
+                          disabled
+                          className="bg-white dark:bg-[#1E2139] px-[20px] border border-[#DFE3FA] dark:border-[#252945] rounded-[4px] outline-none w-full h-[48px] font-bold text-[#0C0E16] text-[12px] dark:text-white"
+                          type="text"
+                          value={val.total}
+                        />
+                      </label>
+                      <img
+                        onClick={() => deleteBox(idx)}
+                        src={Delete}
+                        className="w-[13px] cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button className="bg-[#F9FAFE] dark:bg-[#252945] py-[17px] rounded-[24px] font-bold text-[#7E88C3] text-[12px] dark:text-[#888EB0]" onClick={addBoxFun}>
+                  + Add New Item
+                </button>
+              </div>
             </div>
-            <div className="bottom-0 left-0 lg:left-[73px] fixed flex justify-between gap-[5px] bg-white dark:bg-[#1E2139] px-[24px] py-[22px] md:pl-[50px] w-full md:max-w-[616px] lg:md:max-w-[646px] overflow-hidden animate-slideIn">
+            <div className="bottom-0 left-0 lg:left-[73px] z-[45] fixed flex justify-between gap-[5px] bg-white dark:bg-[#1E2139] px-[24px] py-[22px] md:pl-[50px] w-full md:max-w-[616px] lg:md:max-w-[646px] overflow-hidden animate-slideIn">
               <button onClick={() => { setModal(false) }} className="bg-[#F9FAFE] dark:bg-[#252945] px-[16px] py-[17px] rounded-[24px] font-bold text-[#7E88C3] text-[12px] dark:text-[#DFE3FA] active:scale-95 transition-[0.3s]">Discard</button>
-              <button className="bg-[#373B53] px-[16px] py-[17px] rounded-[24px] font-bold text-[#888EB0] text-[12px] dark:text-[#DFE3FA] active:scale-95 transition-[0.3s]">Save as Draft</button>
-              <button className="bg-[#7C5DFA] px-[16px] py-[17px] rounded-[24px] font-bold text-[12px] text-white active:scale-95 transition-[0.3s]">Save & Send</button>
+              <div className="flex gap-[8px]">
+                <button onClick={() => { handleAddNewCard('draft') }} className="bg-[#373B53] px-[16px] py-[17px] rounded-[24px] font-bold text-[#888EB0] text-[12px] dark:text-[#DFE3FA] active:scale-95 transition-[0.3s]">Save as Draft</button>
+                <button onClick={() => { handleAddNewCard('pending') }} className="bg-[#7C5DFA] px-[16px] py-[17px] rounded-[24px] font-bold text-[12px] text-white active:scale-95 transition-[0.3s]">Save & Send</button>
+              </div>
             </div>
           </div>
         )
